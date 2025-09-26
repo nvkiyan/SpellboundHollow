@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4d17d7ce180849a2b04d4c5a6a119e09, type: 3}
+  m_Name: MainTimeSettings
+  m_EditorClassIdentifier: 
+  secondsInDay: 1200
+  daysInSeason: 28
+  seasonNames:
+  - "\u0412\u0435\u0441\u043D\u0430"
+  - "\u041B\u0435\u0442\u043E"
+  - "\u041E\u0441\u0435\u043D\u044C"
+  - "\u0417\u0438\u043C\u0430"
+  startingYear: 1
+  startingSeason: 0
+  startingDay: 1
+  startingHour: 6
+  startingMinute: 0
