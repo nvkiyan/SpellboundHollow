@@ -1,21 +1,28 @@
+using UnityEngine;
+
 namespace _SpellboundHollow.Scripts.Core
 {
-    using UnityEngine;
-
-    // Эта структура описывает одну-единственную реплику в диалоге
+    /// ScriptableObject, который хранит последовательность реплик, составляющих один диалог.
+    [CreateAssetMenu(fileName = "NewDialogue", menuName = "Spellbound Hollow/Dialogue Data")]
+    public class DialogueDataSO : ScriptableObject
+    {
+        public DialogueLine[] lines;
+    }
+    
+    /// Структура, представляющая одну реплику в диалоге.
+    /// Содержит данные о говорящем персонаже, сам текст реплики,
+    //  а также опциональный спрайт для передачи специфической эмоции.
     [System.Serializable]
     public struct DialogueLine
     {
-        public string characterName; // Имя говорящего
-        [TextArea(2, 4)]
-        public string text; // Текст реплики
-    }
+        [Tooltip("Данные о персонаже, который произносит эту реплику (имя, портрет по умолчанию).")]
+        public CharacterDataSO characterData;
 
-    // Это ScriptableObject, который служит "контейнером" или "сценарием" для целого диалога
-    [CreateAssetMenu(fileName = "NewDialogue", menuName = "Spellbound Hollow/Dialogue")]
-    public class DialogueDataSO : ScriptableObject
-    {
-        // Массив всех реплик, которые принадлежат этому диалогу
-        public DialogueLine[] lines;
+        [Tooltip("Текст реплики. Поддерживает теги Rich Text от TextMeshPro.")]
+        [TextArea(3, 10)]
+        public string text;
+        
+        [Tooltip("(Опционально) Укажите здесь спрайт, чтобы переопределить портрет по умолчанию для этой конкретной реплики.")]
+        public Sprite emotionalPortrait;
     }
 }

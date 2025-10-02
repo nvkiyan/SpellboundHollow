@@ -1,26 +1,43 @@
+using _SpellboundHollow.Scripts.Core;
+using UnityEngine;
+
 namespace _SpellboundHollow.Scripts.Gameplay
 {
-    using UnityEngine;
-    using _SpellboundHollow.Scripts.Core;
-
-    public class CollectibleItem : MonoBehaviour
+    // Убеждаемся, что класс РЕАЛИЗУЕТ IInteractable
+    public class CollectibleItem : MonoBehaviour, IInteractable
     {
         [SerializeField] private StudyItemDataSO itemData;
         [SerializeField] private int quantity = 1;
         
+        [Tooltip("Радиус, в пределах которого игрок должен находиться для взаимодействия.")]
+        [SerializeField] private float interactionRadius = 1.5f;
+        
+        // Реализация свойства из интерфейса
+        public float InteractionRadius => interactionRadius;
+
+        // Реализация метода из интерфейса
+        public void Interact(Transform playerTransform)
+        {
+            Collect();
+        }
+        
         public void Collect()
         {
-            // Проверяем, был ли этот предмет уже изучен
+            if (itemData == null)
+            {
+                Debug.LogError("CollectibleItem: ItemData не назначен!", this);
+                return;
+            }
+            
+            // Здесь ваша логика добавления в инвентарь и гримуар
+            GameManager.Instance.InventoryManager.AddItem(itemData, quantity);
             if (!GameManager.Instance.GrimoireManager.HasStudied(itemData))
             {
-                // Если нет - добавляем запись в Гримуар
                 GameManager.Instance.GrimoireManager.AddStudiedItem(itemData);
             }
             
-            // В любом случае (и в первый раз, и в последующие) добавляем предмет в инвентарь
-            GameManager.Instance.InventoryManager.AddItem(itemData, quantity);
-            
-            Destroy(gameObject); // Уничтожаем объект после сбора
+            // Уничтожаем объект после сбора
+            Destroy(gameObject);
         }
     }
 }

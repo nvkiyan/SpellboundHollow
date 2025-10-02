@@ -1,8 +1,8 @@
 namespace _SpellboundHollow.Scripts.UI
 {
     using UnityEngine;
-    using UnityEngine.InputSystem;
-    using _SpellboundHollow.Scripts.Characters;
+    using Characters;
+    using Core;
 
     public class LetterUI : MonoBehaviour
     {
@@ -10,21 +10,35 @@ namespace _SpellboundHollow.Scripts.UI
 
         void Start()
         {
+            // Проверяем, свободен ли игровой процесс. Если нет (например, уже запущен диалог),
+            // то письмо не будет пытаться показаться.
+            if (GameManager.Instance.CurrentState != GameState.Gameplay)
+            {
+                // Можно либо просто выйти, либо уничтожить объект, чтобы он не мешал.
+                // Для начала просто выйдем.
+                return; 
+            }
+
+            // Захватываем управление
+            GameManager.Instance.SetGameState(GameState.Dialogue);
             _playerController = FindFirstObjectByType<PlayerController>();
-            if (_playerController != null) _playerController.DisableMovement();
         }
 
-        void Update()
+        private void Update()
         {
-            if (Mouse.current.leftButton.wasPressedThisFrame)
+            // Обрабатываем ввод, только если игра в состоянии диалога/UI.
+            if (GameManager.Instance.CurrentState != GameState.Dialogue) return;
+        
+            if (Input.GetMouseButtonDown(0))
             {
-                CloseLetter();
+                // При закрытии письма возвращаем управление.
+                GameManager.Instance.SetGameState(GameState.Gameplay);
+                gameObject.SetActive(false);
             }
         }
 
         private void CloseLetter()
         {
-            if (_playerController != null) _playerController.EnableMovement();
             gameObject.SetActive(false);
         }
     }

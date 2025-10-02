@@ -1,0 +1,16 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8ad5b43fb982c4900982324968fa9ccf, type: 3}
+  m_Name: CD_Amelia
+  m_EditorClassIdentifier: Assembly-CSharp::_SpellboundHollow.Scripts.Core.CharacterDataSO
+  characterName: "\u0410\u043C\u0435\u043B\u0438\u044F"
+  characterPortrait: {fileID: 3931769763262175143, guid: 11e30e1bef4984dff9f4a948019f8360, type: 3}

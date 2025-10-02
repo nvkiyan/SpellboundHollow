@@ -7,7 +7,8 @@ namespace _SpellboundHollow.Scripts.Gameplay
     using System.Collections;
 
     [RequireComponent(typeof(Animator), typeof(Collider2D))]
-    public class AlchemyStation : MonoBehaviour
+    
+    public class AlchemyStation : MonoBehaviour, IInteractable
     {
         [Header("Конфигурация Рецепта")]
         [Tooltip("Рецепт, который будет создаваться на этой станции.")]
@@ -21,6 +22,12 @@ namespace _SpellboundHollow.Scripts.Gameplay
         [Tooltip("Размер зоны успеха в процентах (чем меньше, тем сложнее).")]
         [Range(5, 50)] [SerializeField] private float successZoneSize = 30f;
 
+        [Tooltip("Радиус, в пределах которого игрок должен находиться для взаимодействия.")]
+        [SerializeField] private float interactionRadius = 1.5f;
+
+        // Добавьте это свойство в любое место внутри класса
+        public float InteractionRadius => interactionRadius;
+        
         // --- Ссылки на компоненты и системы ---
         private Animator _animator;
         private AlchemyMinigameUI _minigameUI;
@@ -57,7 +64,7 @@ namespace _SpellboundHollow.Scripts.Gameplay
         }
 
         // Главный метод взаимодействия, вызываемый из PlayerController
-        public void Interact()
+        public void Interact(Transform playerTransform)
         {
             // Игнорируем вызов, если крафт уже идет
             if (_isCrafting) return;

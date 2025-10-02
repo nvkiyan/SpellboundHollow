@@ -1,4 +1,5 @@
 {
+    "version": 1,
     "name": "PlayerControls",
     "maps": [
         {
@@ -15,18 +16,18 @@
                     "initialStateCheck": true
                 },
                 {
-                    "name": "Interact",
+                    "name": "OpenGrimoire",
                     "type": "Button",
-                    "id": "8780b16d-7e66-4655-ae38-30081c2b29f3",
+                    "id": "bc30d472-ed5c-415a-80d5-934cdf566d7e",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
                 },
                 {
-                    "name": "OpenGrimoire",
+                    "name": "PrimaryAction",
                     "type": "Button",
-                    "id": "bc30d472-ed5c-415a-80d5-934cdf566d7e",
+                    "id": "c6f21b1b-7ac1-437b-ad9c-4f5b8f54a068",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
@@ -91,23 +92,23 @@
                 },
                 {
                     "name": "",
-                    "id": "3b70a762-2ea4-49a7-99ea-b0d18fa0c57b",
-                    "path": "<Keyboard>/e",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Interact",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
                     "id": "f15b2cdf-b235-4179-ad0e-ec3dbc09c168",
                     "path": "<Keyboard>/tab",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
                     "action": "OpenGrimoire",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "69738128-3188-4e8e-a732-3760bfc7e383",
+                    "path": "<Mouse>/leftButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "PrimaryAction",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
