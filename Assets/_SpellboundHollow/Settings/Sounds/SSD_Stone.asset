@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 996728f82cf634f0787b8b5e3c0ca79a, type: 3}
   m_Name: SSD_Stone
   m_EditorClassIdentifier: Assembly-CSharp::_SpellboundHollow.Scripts.Core.SurfaceSoundDataSO
-  surfaceTag: 
-  footstepSound: {fileID: 0}
+  surfaceTag: Surface_Stone
+  footstepSound: {fileID: 8300000, guid: 6ac17453c77e4431b9e1425dcd8ac8b3, type: 3}

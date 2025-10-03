@@ -133,27 +133,19 @@ namespace _SpellboundHollow.Scripts.Characters
             }
         }
         
-        // ЗАМЕНИТЕ ЭТОТ МЕТОД ЦЕЛИКОМ
-    private void HandleFootstepSounds()
-    {
-        if (footstepAudioSource == null) return;
-
-        bool isMovingNow = _moveInput.sqrMagnitude > 0.01f;
-
-        if (isMovingNow)
+        private void HandleFootstepSounds()
         {
-            // Debug.Log("Player IS MOVING."); // Раскомментируйте, если нужно проверить самое начало
-            
-            RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, footstepRaycastDistance, surfaceLayerMask);
+            if (footstepAudioSource == null) return;
 
-            if (hit.collider != null)
+            bool isMovingNow = _moveInput.sqrMagnitude > 0.01f;
+
+            if (isMovingNow)
             {
-                string currentSurfaceTag = hit.collider.tag;
-                Debug.Log($"[Footsteps] Raycast HIT: '{hit.collider.name}', Tag: '{currentSurfaceTag}'");
+                RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, footstepRaycastDistance, surfaceLayerMask);
+                string currentSurfaceTag = hit.collider != null ? hit.collider.tag : null;
                 
                 if (currentSurfaceTag != _previousSurfaceTag)
                 {
-                    Debug.Log($"[Footsteps] Surface CHANGED to: '{currentSurfaceTag}'. Searching for sound...");
                     _previousSurfaceTag = currentSurfaceTag;
                     footstepAudioSource.Stop();
 
@@ -162,34 +154,25 @@ namespace _SpellboundHollow.Scripts.Characters
                         SurfaceSoundDataSO soundData = surfaceSounds.FirstOrDefault(s => s.surfaceTag == currentSurfaceTag);
                         if (soundData != null && soundData.footstepSound != null)
                         {
-                            Debug.Log($"[Footsteps] SUCCESS: Sound found for '{currentSurfaceTag}'. Playing clip '{soundData.footstepSound.name}'.");
                             footstepAudioSource.clip = soundData.footstepSound;
                             footstepAudioSource.Play();
                         }
-                        else
-                        {
-                            Debug.LogWarning($"[Footsteps] Sound data NOT FOUND for tag '{currentSurfaceTag}'.");
-                        }
                     }
+                }
+                else if (!footstepAudioSource.isPlaying && currentSurfaceTag != null)
+                {
+                    footstepAudioSource.Play();
                 }
             }
             else
             {
-                Debug.LogWarning("[Footsteps] Raycast hit NOTHING. Player is in the air?");
-                if (footstepAudioSource.isPlaying) footstepAudioSource.Stop();
+                if (footstepAudioSource.isPlaying)
+                {
+                    footstepAudioSource.Stop();
+                }
                 _previousSurfaceTag = null;
             }
         }
-        else // Если игрок остановился
-        {
-            if (footstepAudioSource.isPlaying)
-            {
-                Debug.Log("[Footsteps] Player STOPPED. Stopping sound.");
-                footstepAudioSource.Stop();
-            }
-            _previousSurfaceTag = null;
-        }
-    }
 
         private void OnMovePerformed(InputAction.CallbackContext context)
         {

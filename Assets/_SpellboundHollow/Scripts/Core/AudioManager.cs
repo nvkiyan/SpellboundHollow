@@ -17,7 +17,7 @@ namespace _SpellboundHollow.Scripts.Core
                 return;
             }
             Instance = this;
-            DontDestroyOnLoad(gameObject);
+            // DontDestroyOnLoad(gameObject);
 
             AudioSource[] sources = GetComponents<AudioSource>();
             _musicSource = sources[0]; // Первый источник - для музыки

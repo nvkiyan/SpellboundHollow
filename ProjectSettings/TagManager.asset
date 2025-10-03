@@ -3,7 +3,12 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 3
-  tags: []
+  tags:
+  - Surface_Grass
+  - Surface_Dirt
+  - Surface_Stone
+  - Surface_OldWood
+  - Surface_Snow
   layers:
   - Default
   - TransparentFX
@@ -11,10 +16,11 @@ TagManager:
   - Ground
   - Water
   - UI
-  - Objects_Back
-  - Player
   - Objects_Front
+  - Player
+  - Objects_Back
   - Foreground
+  - Interactables
   - 
   - 
   - 
@@ -36,7 +42,6 @@ TagManager:
   - 
   - 
   - 
-  - InteractiveObject
   m_SortingLayers:
   - name: Bottom
     uniqueID: 1161173501
