@@ -6,31 +6,25 @@ namespace _SpellboundHollow.Scripts.Gameplay
 {
     public class InteractionTrigger : MonoBehaviour, IInteractable
     {
-        // Enum теперь публичный, так как используется в публичных полях, и с корректным регистром
         public enum InteractionType
         {
             DoNothing,
-            DialogueSo, // Исправлен регистр
+            DialogueSo,
             InlineDialogue,
             Thought,
             RepeatInitial 
         }
 
-        // --- ИМЕНА ПОЛЕЙ ИСПРАВЛЕНЫ В СООТВЕТСТВИИ СО СТАНДАРТОМ UNITY ---
         [Header("Primary Interaction")]
-        [Tooltip("Действие, которое произойдет при первом взаимодействии.")]
         [SerializeField] private InteractionType initialAction = InteractionType.Thought;
         [SerializeField] private DialogueDataSO initialDialogueSo;
         [SerializeField] private DialogueLine[] initialInlineDialogue;
-        [Tooltip("Варианты текста для облачка мыслей. Если их несколько, будет выбран случайный.")]
         [SerializeField] private string[] initialThoughtTexts;
         
         [Header("Subsequent Interaction")]
-        [Tooltip("Действие при всех последующих взаимодействиях.")]
         [SerializeField] private InteractionType subsequentAction = InteractionType.RepeatInitial;
         [SerializeField] private DialogueDataSO subsequentDialogueSo;
         [SerializeField] private DialogueLine[] subsequentInlineDialogue;
-        [Tooltip("Варианты текста для облачка мыслей. Если их несколько, будет выбран случайный.")]
         [SerializeField] private string[] subsequentThoughtTexts;
 
         [Header("Trigger Settings")]

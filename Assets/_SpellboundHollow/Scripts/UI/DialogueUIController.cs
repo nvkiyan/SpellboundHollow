@@ -15,7 +15,6 @@ namespace _SpellboundHollow.Scripts.UI
 
         [Header("Typing Effect Settings")]
         [SerializeField] private float typingSpeed = 0.04f;
-
         public bool IsTyping { get; private set; }
         
         private CanvasGroup _canvasGroup;
@@ -38,9 +37,9 @@ namespace _SpellboundHollow.Scripts.UI
 
         public void HideDialoguePanel()
         {
-            _canvasGroup.alpha = 0f;        // Делаем панель невидимой
-            _canvasGroup.interactable = false; // Отключаем интерактивность (для кнопок и т.д.)
-            _canvasGroup.blocksRaycasts = false; // ПРИНУДИТЕЛЬНО отключаем блокировку кликов
+            _canvasGroup.alpha = 0f;
+            _canvasGroup.interactable = false;
+            _canvasGroup.blocksRaycasts = false;
         }
 
         public void DisplayLine(Core.DialogueLine line)
@@ -61,18 +60,10 @@ namespace _SpellboundHollow.Scripts.UI
             _typingCoroutine = StartCoroutine(TypeLine(line.text));
         }
 
-        /// <summary>
-        /// Мгновенно завершает эффект "пишущей машинки", отображая весь текст реплики.
-        /// Работает, устанавливая максимальное количество видимых символов в TextMeshPro.
-        /// </summary>
         public void CompleteLine()
         {
             if (_typingCoroutine != null) StopCoroutine(_typingCoroutine);
-            
-            // TextMeshPro хранит полный текст, но отображает только часть.
-            // Эта команда говорит ему отобразить все символы немедленно.
             dialogueText.maxVisibleCharacters = dialogueText.textInfo.characterCount;
-            
             IsTyping = false;
         }
         
@@ -81,9 +72,6 @@ namespace _SpellboundHollow.Scripts.UI
             IsTyping = true;
             dialogueText.text = line;
             dialogueText.maxVisibleCharacters = 0;
-            
-            // Необходимо подождать один кадр, чтобы TextMeshPro успел обработать
-            // геометрию полного текста и правильно рассчитать переносы строк.
             yield return null; 
 
             int totalVisibleCharacters = dialogueText.textInfo.characterCount;
@@ -92,7 +80,7 @@ namespace _SpellboundHollow.Scripts.UI
                 dialogueText.maxVisibleCharacters++;
                 yield return new WaitForSeconds(typingSpeed);
             }
-
+            
             IsTyping = false;
         }
     }

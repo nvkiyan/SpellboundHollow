@@ -14,6 +14,10 @@ namespace _SpellboundHollow.Scripts.Core
         private bool _isDialogueActive;
         private DialogueLine _currentLine;
         private bool _isAcceptingInput;
+        
+        [Header("Sound Settings")]
+        [Tooltip("Звук, который проигрывается один раз при открытии диалогового окна.")]
+        [SerializeField] private AudioClip openDialogueSound;
 
         public bool IsDialogueActive => _isDialogueActive;
 
@@ -42,6 +46,9 @@ namespace _SpellboundHollow.Scripts.Core
         public void StartDialogue(DialogueDataSO dialogueData)
         {
             if (_isDialogueActive) return;
+            
+            // Проигрываем звук открытия диалога через AudioManager
+            AudioManager.Instance.PlaySFX(openDialogueSound);
 
             GameManager.Instance.SetGameState(GameState.Dialogue);
             _isDialogueActive = true;
@@ -60,6 +67,8 @@ namespace _SpellboundHollow.Scripts.Core
 
         public void EndDialogue()
         {
+            if (!_isDialogueActive) return;
+
             _isDialogueActive = false;
             
             if (dialogueUIController != null)

@@ -19,6 +19,8 @@ namespace _SpellboundHollow.Scripts.UI
         [Header("Settings")]
         [SerializeField] private float fadeDuration = 0.5f;
         [SerializeField] private Vector3 positionOffset;
+        [Header("Sound Settings")]
+        [SerializeField] private AudioClip appearSound;
 
         private Coroutine _activeCoroutine;
         private Camera _mainCamera;
@@ -65,6 +67,8 @@ namespace _SpellboundHollow.Scripts.UI
 
         public void ShowThought(string text, Transform target, float duration)
         {
+            Core.AudioManager.Instance.PlaySFX(appearSound);
+            
             if (_activeCoroutine != null)
             {
                 StopCoroutine(_activeCoroutine);
