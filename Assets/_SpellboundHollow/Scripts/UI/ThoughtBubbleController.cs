@@ -4,10 +4,7 @@ using UnityEngine;
 
 namespace _SpellboundHollow.Scripts.UI
 {
-    /// <summary>
-    /// Управляет отображением UI-элемента "Облачко Мыслей".
-    /// Является синглтоном для легкого доступа из любого места в коде.
-    /// </summary>
+    [RequireComponent(typeof(CanvasGroup))]
     public class ThoughtBubbleController : MonoBehaviour
     {
         public static ThoughtBubbleController Instance { get; private set; }
@@ -18,73 +15,48 @@ namespace _SpellboundHollow.Scripts.UI
 
         [Header("Settings")]
         [SerializeField] private float fadeDuration = 0.5f;
-        [SerializeField] private Vector3 positionOffset;
+        
         [Header("Sound Settings")]
         [SerializeField] private AudioClip appearSound;
 
         private Coroutine _activeCoroutine;
-        private Camera _mainCamera;
-        private Transform _targetToFollow;
 
         private void Awake()
         {
-            if (Instance != null && Instance != this)
-            {
-                Destroy(gameObject);
-                return;
-            }
+            if (Instance != null && Instance != this) { Destroy(gameObject); return; }
             Instance = this;
 
-            // Проверка на случай, если CanvasGroup не был назначен в инспекторе.
-            // Это предотвратит ошибки и поможет в отладке.
-            if (canvasGroup == null)
-            {
-                canvasGroup = GetComponent<CanvasGroup>();
-                if (canvasGroup == null)
-                {
-                    Debug.LogError("ThoughtBubbleController: CanvasGroup component is missing!", this);
-                    enabled = false; // Выключаем компонент, чтобы избежать дальнейших ошибок.
-                }
-            }
+            if (canvasGroup == null) canvasGroup = GetComponent<CanvasGroup>();
         }
         
         private void Start()
         {
-            _mainCamera = Camera.main;
-            // Изначально облачко полностью невидимо и не блокирует клики.
             canvasGroup.alpha = 0f;
             canvasGroup.interactable = false;
-            canvasGroup.blocksRaycasts = false; // Эта строка — ключевое исправление.
+            canvasGroup.blocksRaycasts = false;
         }
 
-        private void LateUpdate()
-        {
-            if (_targetToFollow != null)
-            {
-                transform.position = _mainCamera.WorldToScreenPoint(_targetToFollow.position + positionOffset);
-            }
-        }
+        // --- ЛОГИКА СЛЕДОВАНИЯ ЗА ПЕРСОНАЖЕМ ПОЛНОСТЬЮ УДАЛЕНА ---
+        // Метод LateUpdate() больше не нужен.
 
-        public void ShowThought(string text, Transform target, float duration)
+        /// <summary>
+        /// Показывает панель с мыслью. Теперь она не требует позиции, так как закреплена на экране.
+        /// </summary>
+        /// <param name="text">Текст для отображения.</param>
+        /// <param name="playerTransform">Этот параметр больше не используется, но оставлен для обратной совместимости, чтобы не ломать InteractionTrigger.</param>
+        /// <param name="duration">Длительность отображения.</param>
+        public void ShowThought(string text, Transform playerTransform, float duration)
         {
             Core.AudioManager.Instance.PlaySFX(appearSound);
-            
-            if (_activeCoroutine != null)
-            {
-                StopCoroutine(_activeCoroutine);
-            }
-            _activeCoroutine = StartCoroutine(ShowThoughtRoutine(text, target, duration));
+
+            if (_activeCoroutine != null) StopCoroutine(_activeCoroutine);
+            _activeCoroutine = StartCoroutine(ShowThoughtRoutine(text, duration));
         }
 
-        private IEnumerator ShowThoughtRoutine(string text, Transform target, float duration)
+        private IEnumerator ShowThoughtRoutine(string text, float duration)
         {
-            _targetToFollow = target;
             thoughtText.text = text;
             
-            // Во время показа мы можем временно блокировать рейкасты, если это понадобится,
-            // но для облачка мыслей это не нужно.
-            // canvasGroup.blocksRaycasts = true;
-
             float timer = 0f;
             while (timer < fadeDuration)
             {
@@ -105,8 +77,6 @@ namespace _SpellboundHollow.Scripts.UI
             }
             canvasGroup.alpha = 0f;
             
-            // canvasGroup.blocksRaycasts = false; // Возвращаем обратно, если включали
-            _targetToFollow = null; 
             _activeCoroutine = null;
         }
     }
