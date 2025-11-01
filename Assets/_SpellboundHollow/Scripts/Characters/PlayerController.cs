@@ -58,7 +58,6 @@ namespace _SpellboundHollow.Scripts.Characters
 
         private void OnDestroy()
         {
-            // Корректно отписываемся от всех событий, чтобы избежать утечек памяти
             if (_playerControls == null) return;
             _playerControls.Player.Move.performed -= OnMovePerformed;
             _playerControls.Player.Move.canceled -= OnMoveCanceled;
@@ -74,7 +73,9 @@ namespace _SpellboundHollow.Scripts.Characters
 
         private void Update() 
         {
+            // Эта проверка должна выполняться каждый кадр, чтобы UI корректно блокировал ввод, когда он виден.
             _isPointerOverUI = EventSystem.current.IsPointerOverGameObject(); 
+            
             if (GameManager.Instance.CurrentState == GameState.Gameplay) 
             { 
                 UpdateAnimator(); 
@@ -232,7 +233,7 @@ namespace _SpellboundHollow.Scripts.Characters
         
         private void OnDrawGizmos() 
         { 
-            if (Application.isPlaying) 
+            if (Application.isPlaying && _mainCamera != null) 
             { 
                 RaycastHit2D hit = Physics2D.Raycast(_mainCamera.ScreenToWorldPoint(Mouse.current.position.ReadValue()), Vector2.zero, Mathf.Infinity, interactableLayerMask); 
                 if (hit.collider != null && hit.collider.TryGetComponent(out IInteractable interactable)) 
