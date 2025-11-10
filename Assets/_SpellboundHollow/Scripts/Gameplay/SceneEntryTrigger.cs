@@ -4,11 +4,16 @@ using UnityEngine;
 namespace _SpellboundHollow.Scripts.Gameplay
 {
     /// <summary>
-    /// Запускает указанный диалог автоматически при старте сцены.
+    /// Запускает указанный диалог автоматически при старте сцены и служит точкой входа в сцену.
     /// Полезен для стартовых монологов или сюжетных событий при входе в локацию.
     /// </summary>
     public class SceneEntryTrigger : MonoBehaviour
     {
+        [Header("Entry Point Settings")]
+        [Tooltip("Уникальный идентификатор этой точки входа. Используется дверями для телепортации игрока.")]
+        [SerializeField] private string entryId;
+        
+        [Header("Dialogue Settings")]
         [Tooltip("Диалог, который будет запущен при загрузке этого объекта.")]
         [SerializeField] private DialogueDataSO entryDialogue;
 
@@ -18,24 +23,26 @@ namespace _SpellboundHollow.Scripts.Gameplay
         [Tooltip("Уникальный идентификатор для этого триггера. Нужен, чтобы игра 'помнила', что он уже сработал.")]
         [SerializeField] private string triggerId;
 
+        // Публичное свойство, чтобы SceneTransitionManager мог прочитать ID этой точки входа.
+        public string EntryId => entryId;
+
         private void Start()
         {
             if (entryDialogue == null)
             {
-                Debug.LogWarning("SceneEntryTrigger: Диалог не назначен!", this);
+                // Это сообщение не должно быть ошибкой, так как точка входа может и не иметь диалога.
+                // Debug.LogWarning("SceneEntryTrigger: Диалог не назначен!", this);
                 return;
             }
 
-            // Проверяем, нужно ли сработать только один раз.
             if (triggerOnce)
             {
                 if (string.IsNullOrEmpty(triggerId))
                 {
-                    Debug.LogError("SceneEntryTrigger: Установлен флаг 'triggerOnce', но не указан уникальный ID!", this);
+                    Debug.LogError("SceneEntryTrigger: Установлен флаг 'triggerOnce', но не указан уникальный ID для диалога!", this);
                     return;
                 }
                 
-                // Проверяем, был ли этот триггер уже активирован (например, через систему сохранений)
                 // ЗАГЛУШКА: Здесь будет проверка в GameManager или SaveManager
                 // if (GameManager.Instance.ProgressManager.IsTriggerCompleted(triggerId))
                 // {
@@ -43,10 +50,8 @@ namespace _SpellboundHollow.Scripts.Gameplay
                 // }
             }
 
-            // Запускаем диалог
             GameManager.Instance.DialogueManager.StartDialogue(entryDialogue);
             
-            // Если нужно, помечаем триггер как выполненный
             // ЗАГЛУШКА: Здесь будет вызов GameManager.Instance.ProgressManager.CompleteTrigger(triggerId);
         }
     }

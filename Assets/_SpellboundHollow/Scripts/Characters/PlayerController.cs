@@ -73,10 +73,11 @@ namespace _SpellboundHollow.Scripts.Characters
 
         private void Update() 
         {
-            // Эта проверка должна выполняться каждый кадр, чтобы UI корректно блокировал ввод, когда он виден.
             _isPointerOverUI = EventSystem.current.IsPointerOverGameObject(); 
             
-            if (GameManager.Instance.CurrentState == GameState.Gameplay) 
+            bool isGameplay = GameManager.Instance.CurrentState == GameState.Gameplay;
+            
+            if (isGameplay) 
             { 
                 UpdateAnimator(); 
                 HandleFootstepSounds(); 
@@ -90,6 +91,7 @@ namespace _SpellboundHollow.Scripts.Characters
                     footstepAudioSource.Stop(); 
                 }
             } 
+            
             HandleCursor(); 
         }
         
@@ -206,15 +208,34 @@ namespace _SpellboundHollow.Scripts.Characters
         
         private void OnPrimaryAction(InputAction.CallbackContext context)
         {
-            if (GameManager.Instance.CurrentState != GameState.Gameplay) return;
-            if (_isPointerOverUI) return;
+            // ПРАВИЛЬНЫЙ ПОРЯДОК ПРОВЕРОК:
+            
+            // 1. Проверяем состояние диалога ПЕРЕД проверкой UI.
+            //    Если идет диалог, PlayerController не должен ничего делать.
+            //    Клик будет обработан в DialogueManager.Update().
+            if (GameManager.Instance.CurrentState == GameState.Dialogue)
+            {
+                return;
+            }
+            
+            // 2. Если игра НЕ в диалоге, тогда проверяем, не над UI ли курсор.
+            //    Это нужно для других элементов интерфейса (инвентарь, меню паузы).
+            if (_isPointerOverUI)
+            {
+                return;
+            }
 
+            // 3. Если все проверки пройдены, значит, мы в состоянии Gameplay
+            //    и можем взаимодействовать с миром.
+            HandleInteraction();
+        }
+
+        private void HandleInteraction()
+        {
             Vector2 worldPosition = _mainCamera.ScreenToWorldPoint(Mouse.current.position.ReadValue());
             RaycastHit2D hit = Physics2D.Raycast(worldPosition, Vector2.zero, Mathf.Infinity, interactableLayerMask);
             
-            if (hit.collider == null) return;
-            
-            if (hit.collider.TryGetComponent(out IInteractable interactableObject))
+            if (hit.collider != null && hit.collider.TryGetComponent(out IInteractable interactableObject))
             {
                 if (Vector2.Distance(transform.position, hit.collider.transform.position) <= interactableObject.InteractionRadius)
                 {

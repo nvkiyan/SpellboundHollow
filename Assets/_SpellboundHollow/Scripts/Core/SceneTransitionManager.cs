@@ -1,7 +1,9 @@
 using System.Collections;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using _SpellboundHollow.Scripts.Characters;
+using _SpellboundHollow.Scripts.Gameplay;
 
 namespace _SpellboundHollow.Scripts.Core
 {
@@ -13,27 +15,33 @@ namespace _SpellboundHollow.Scripts.Core
         [SerializeField] private float fadeDuration = 1f;
         
         private bool _isTransitioning;
+        private static string _targetEntryPointId;
 
         private void Awake()
         {
-            // Этот скрипт живет на "бессмертном" GameManager,
-            // поэтому ему не нужен собственный DontDestroyOnLoad.
             if (Instance != null)
             {
-                // Этого не должно происходить при правильной настройке, но это защита.
                 Destroy(this); 
                 return;
             }
             Instance = this;
+            
+            SceneManager.sceneLoaded += OnSceneLoaded;
         }
 
-        public void TransitionToScene(string sceneName, Vector3 targetPosition)
+        private void OnDestroy()
+        {
+            SceneManager.sceneLoaded -= OnSceneLoaded;
+        }
+
+        public void TransitionToScene(string sceneName, string entryPointId)
         {
             if (_isTransitioning) return;
-            StartCoroutine(TransitionRoutine(sceneName, targetPosition));
+            _targetEntryPointId = entryPointId;
+            StartCoroutine(TransitionRoutine(sceneName));
         }
 
-        private IEnumerator TransitionRoutine(string sceneName, Vector3 targetPosition)
+        private IEnumerator TransitionRoutine(string sceneName)
         {
             _isTransitioning = true;
             GameManager.Instance.SetGameState(GameState.Paused);
@@ -43,25 +51,44 @@ namespace _SpellboundHollow.Scripts.Core
             AsyncOperation operation = SceneManager.LoadSceneAsync(sceneName);
             while (!operation.isDone) { yield return null; }
 
-            // Ждем один кадр, чтобы все объекты на новой сцене успели инициализироваться.
-            yield return null; 
-
-            PlayerController player = FindObjectOfType<PlayerController>();
+            yield return StartCoroutine(Fade(0f));
+            
+            GameManager.Instance.SetGameState(GameState.Gameplay);
+            _isTransitioning = false;
+        }
+        
+        private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+        {
+            if (string.IsNullOrEmpty(_targetEntryPointId)) return;
+            
+            // Используем современный, более производительный метод FindObjectsByType.
+            // FindObjectsSortMode.None указывает, что нам не важен порядок, что делает поиск еще быстрее.
+            SceneEntryTrigger[] entryPoints = FindObjectsByType<SceneEntryTrigger>(FindObjectsSortMode.None);
+            SceneEntryTrigger targetPoint = entryPoints.FirstOrDefault(p => p.EntryId == _targetEntryPointId);
+            
+            if (targetPoint == null)
+            {
+                Debug.LogError($"Не удалось найти точку входа с ID: '{_targetEntryPointId}' в сцене '{scene.name}'!");
+                _targetEntryPointId = null;
+                return;
+            }
+            
+            // Используем современный метод FindFirstObjectByType, который заменяет устаревший FindObjectOfType.
+            PlayerController player = FindFirstObjectByType<PlayerController>();
             if (player != null)
             {
-                player.GetComponent<Rigidbody2D>().simulated = false;
-                player.transform.position = targetPosition;
-                player.GetComponent<Rigidbody2D>().simulated = true;
+                var playerRb = player.GetComponent<Rigidbody2D>();
+                playerRb.simulated = false;
+                player.transform.position = targetPoint.transform.position;
+                playerRb.simulated = true;
             }
             else 
             { 
                 Debug.LogError("SceneTransitionManager: PlayerController не найден на новой сцене!"); 
             }
-
-            yield return StartCoroutine(Fade(0f));
             
-            GameManager.Instance.SetGameState(GameState.Gameplay);
-            _isTransitioning = false;
+            // Сбрасываем ID, чтобы он не использовался при следующей загрузке сцены.
+            _targetEntryPointId = null;
         }
 
         private IEnumerator Fade(float targetAlpha)

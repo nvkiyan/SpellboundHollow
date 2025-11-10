@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using _SpellboundHollow.Scripts.Core;
 using _SpellboundHollow.Scripts.UI;
 using UnityEngine;
+using UnityEngine.InputSystem; // <-- ВАЖНО: Добавляем using для новой системы ввода
 
 namespace _SpellboundHollow.Scripts.Core
 {
@@ -13,7 +14,6 @@ namespace _SpellboundHollow.Scripts.Core
         private Queue<DialogueLine> _linesQueue;
         private bool _isDialogueActive;
         private DialogueLine _currentLine;
-        private bool _isAcceptingInput;
         
         [Header("Sound Settings")]
         [Tooltip("Звук, который проигрывается один раз при открытии диалогового окна.")]
@@ -25,17 +25,23 @@ namespace _SpellboundHollow.Scripts.Core
         {
             _linesQueue = new Queue<DialogueLine>();
         }
-        
+
+        // Возвращаем метод Update для обработки кликов во время диалога.
         private void Update()
         {
-            if (GameManager.Instance.CurrentState != GameState.Dialogue || !_isAcceptingInput) return;
+            // Метод работает только если игра в состоянии диалога.
+            if (GameManager.Instance.CurrentState != GameState.Dialogue) return;
             
-            if (Input.GetMouseButtonDown(0))
+            // Используем новую систему ввода, чтобы избежать конфликтов.
+            // Mouse.current.leftButton.wasPressedThisFrame - это современный аналог Input.GetMouseButtonDown(0).
+            if (Mouse.current.leftButton.wasPressedThisFrame)
             {
+                // Если в данный момент печатается строка, завершаем ее досрочно.
                 if (dialogueUIController.IsTyping)
                 {
                     dialogueUIController.CompleteLine();
                 }
+                // Если строка уже напечатана, показываем следующую.
                 else
                 {
                     DisplayNextLine();
@@ -47,7 +53,6 @@ namespace _SpellboundHollow.Scripts.Core
         {
             if (_isDialogueActive) return;
             
-            // Проигрываем звук открытия диалога через AudioManager
             AudioManager.Instance.PlaySFX(openDialogueSound);
 
             GameManager.Instance.SetGameState(GameState.Dialogue);
@@ -61,7 +66,6 @@ namespace _SpellboundHollow.Scripts.Core
                 _linesQueue.Enqueue(line);
             }
             
-            StartCoroutine(EnableInputAfterFrame());
             DisplayNextLine();
         }
 
@@ -92,13 +96,6 @@ namespace _SpellboundHollow.Scripts.Core
 
             _currentLine = _linesQueue.Dequeue();
             dialogueUIController.DisplayLine(_currentLine);
-        }
-
-        private IEnumerator EnableInputAfterFrame()
-        {
-            _isAcceptingInput = false;
-            yield return null; 
-            _isAcceptingInput = true;
         }
     }
 }

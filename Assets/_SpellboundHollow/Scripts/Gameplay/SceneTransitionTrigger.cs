@@ -6,8 +6,10 @@ namespace _SpellboundHollow.Scripts.Gameplay
     public class SceneTransitionTrigger : MonoBehaviour, IInteractable
     {
         [Header("Transition Settings")]
+        [Tooltip("Точное имя сцены для загрузки.")]
         [SerializeField] private string sceneToLoad;
-        [SerializeField] private Transform targetEntryPoint;
+        [Tooltip("ID точки входа (из компонента SceneEntryTrigger) в целевой сцене.")]
+        [SerializeField] private string targetEntryPointId;
         
         [Header("Interaction Settings")]
         [SerializeField] private float interactionRadius = 2.5f;
@@ -15,16 +17,16 @@ namespace _SpellboundHollow.Scripts.Gameplay
 
         public void Interact(Transform playerTransform)
         {
-            if (string.IsNullOrEmpty(sceneToLoad) || targetEntryPoint == null)
+            if (string.IsNullOrEmpty(sceneToLoad) || string.IsNullOrEmpty(targetEntryPointId))
             {
-                Debug.LogError("SceneTransitionTrigger не настроен!", this);
+                Debug.LogError("SceneTransitionTrigger не настроен! Укажите Scene To Load и Target Entry Point ID.", this);
                 return;
             }
-
-            // Проверяем, существует ли SceneTransitionManager, прежде чем его вызывать
+            
             if (SceneTransitionManager.Instance != null)
             {
-                SceneTransitionManager.Instance.TransitionToScene(sceneToLoad, targetEntryPoint.position);
+                // Теперь передаем ID точки входа, а не позицию.
+                SceneTransitionManager.Instance.TransitionToScene(sceneToLoad, targetEntryPointId);
             }
             else
             {
