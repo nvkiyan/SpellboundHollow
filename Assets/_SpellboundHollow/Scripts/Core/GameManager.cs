@@ -32,13 +32,20 @@ namespace _SpellboundHollow.Scripts.Core
                 return _instance;
             }
         }
-        
+
+        [Header("System Managers")]
         [SerializeField] private DialogueManager dialogueManager;
         [SerializeField] private TimeManager timeManager;
         [SerializeField] private InventoryManager inventoryManager;
         [SerializeField] private GrimoireManager grimoireManager;
         [SerializeField] private SceneTransitionManager sceneTransitionManager;
         [SerializeField] private AudioManager audioManager;
+        
+        // --- ДОБАВЛЕНО ---
+        [Header("UI References")]
+        [Tooltip("Ссылка на Transform основного 'бессмертного' Canvas. Нужна для создания UI-элементов.")]
+        [SerializeField] private Transform mainCanvasTransform;
+        // --- КОНЕЦ ДОБАВЛЕНИЯ ---
         
         public DialogueManager DialogueManager => dialogueManager;
         public TimeManager TimeManager => timeManager;
@@ -47,27 +54,27 @@ namespace _SpellboundHollow.Scripts.Core
         public SceneTransitionManager SceneTransitionManager => sceneTransitionManager;
         public AudioManager AudioManager => audioManager;
         
+        // --- ДОБАВЛЕНО ---
+        public Transform MainCanvasTransform => mainCanvasTransform;
+        // --- КОНЕЦ ДОБАВЛЕНИЯ ---
+        
         public GameState CurrentState { get; private set; }
-
+        
         private void Awake()
         {
             if (_instance != null && _instance != this) 
             {
+                // --- ДИАГНОСТИЧЕСКАЯ СТРОКА ---
+                Debug.Break(); // Эта команда немедленно поставит редактор на паузу.
+        
                 Destroy(gameObject);
                 return;
             }
             _instance = this;
             DontDestroyOnLoad(gameObject);
-            
-            // Устанавливаем начальное состояние здесь, в Awake.
-            // Awake() гарантированно выполнится до любого Start().
-            // Это предотвращает "гонку состояний", когда SceneEntryTrigger.Start()
-            // устанавливает состояние Dialogue, а GameManager.Start() его перезаписывает.
+    
             CurrentState = GameState.Gameplay;
         }
-
-        // Метод Start() больше не нужен для установки состояния, так как это сделано в Awake.
-        // private void Start() { }
         
         public void SetGameState(GameState newState) 
         { 

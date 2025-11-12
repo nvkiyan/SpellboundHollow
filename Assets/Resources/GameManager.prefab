@@ -1284,6 +1284,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5cd4d5f2c554148c4981b3c1ec4a5ea4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LetterUI
+  closeButton: {fileID: 0}
 --- !u!1 &2531482921423864299
 GameObject:
   m_ObjectHideFlags: 0
@@ -2611,6 +2612,7 @@ MonoBehaviour:
   grimoireManager: {fileID: 867328436089654061}
   sceneTransitionManager: {fileID: 2557412483184854968}
   audioManager: {fileID: 597058439853009759}
+  mainCanvasTransform: {fileID: 4937006280578652632}
 --- !u!114 &2557412483184854968
 MonoBehaviour:
   m_ObjectHideFlags: 0

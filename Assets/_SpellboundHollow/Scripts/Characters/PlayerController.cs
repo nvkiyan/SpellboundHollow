@@ -176,15 +176,15 @@ namespace _SpellboundHollow.Scripts.Characters
         
         private void HandleCursor() 
         { 
-            if (_isPointerOverUI) 
-            { 
-                if (_currentInteractable != null) 
-                { 
-                    Cursor.SetCursor(defaultCursor, Vector2.zero, CursorMode.Auto); 
-                    _currentInteractable = null; 
-                } 
-                return; 
-            } 
+            if (GameManager.Instance.CurrentState != GameState.Gameplay || _isPointerOverUI)
+            {
+                if (_currentInteractable != null)
+                {
+                    Cursor.SetCursor(defaultCursor, Vector2.zero, CursorMode.Auto);
+                    _currentInteractable = null;
+                }
+                return;
+            }
             
             RaycastHit2D hit = Physics2D.Raycast(_mainCamera.ScreenToWorldPoint(Mouse.current.position.ReadValue()), Vector2.zero, Mathf.Infinity, interactableLayerMask); 
             
@@ -208,26 +208,15 @@ namespace _SpellboundHollow.Scripts.Characters
         
         private void OnPrimaryAction(InputAction.CallbackContext context)
         {
-            // ПРАВИЛЬНЫЙ ПОРЯДОК ПРОВЕРОК:
-            
-            // 1. Проверяем состояние диалога ПЕРЕД проверкой UI.
-            //    Если идет диалог, PlayerController не должен ничего делать.
-            //    Клик будет обработан в DialogueManager.Update().
-            if (GameManager.Instance.CurrentState == GameState.Dialogue)
-            {
-                return;
-            }
-            
-            // 2. Если игра НЕ в диалоге, тогда проверяем, не над UI ли курсор.
-            //    Это нужно для других элементов интерфейса (инвентарь, меню паузы).
-            if (_isPointerOverUI)
-            {
-                return;
-            }
+            // Если курсор над UI, клик должен быть обработан EventSystem.
+            if (_isPointerOverUI) return;
 
-            // 3. Если все проверки пройдены, значит, мы в состоянии Gameplay
-            //    и можем взаимодействовать с миром.
-            HandleInteraction();
+            // Если игра в состоянии геймплея, обрабатываем взаимодействие.
+            // В других состояниях (Dialogue, Paused) PlayerController не должен реагировать на клики.
+            if (GameManager.Instance.CurrentState == GameState.Gameplay)
+            {
+                HandleInteraction();
+            }
         }
 
         private void HandleInteraction()

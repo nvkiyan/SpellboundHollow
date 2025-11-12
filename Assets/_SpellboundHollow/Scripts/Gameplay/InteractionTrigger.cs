@@ -12,7 +12,8 @@ namespace _SpellboundHollow.Scripts.Gameplay
             DialogueSo,
             InlineDialogue,
             Thought,
-            RepeatInitial 
+            RepeatInitial,
+            ShowUIPrefab
         }
 
         [Header("Primary Interaction")]
@@ -20,7 +21,8 @@ namespace _SpellboundHollow.Scripts.Gameplay
         [SerializeField] private DialogueDataSO initialDialogueSo;
         [SerializeField] private DialogueLine[] initialInlineDialogue;
         [SerializeField] private string[] initialThoughtTexts;
-        
+        [SerializeField] private GameObject uiPrefabToShow; 
+
         [Header("Subsequent Interaction")]
         [SerializeField] private InteractionType subsequentAction = InteractionType.RepeatInitial;
         [SerializeField] private DialogueDataSO subsequentDialogueSo;
@@ -28,10 +30,13 @@ namespace _SpellboundHollow.Scripts.Gameplay
         [SerializeField] private string[] subsequentThoughtTexts;
 
         [Header("Trigger Settings")]
-        [SerializeField] private float interactionRadius = 2.5f;
-        public float InteractionRadius => interactionRadius;
+        [SerializeField] private float _interactionRadius = 2.5f;
+        [Tooltip("Если true, объект будет уничтожен после первого успешного взаимодействия.")]
+        [SerializeField] private bool destroyAfterInteraction; 
         [SerializeField] private string triggerId;
         private bool _hasBeenTriggered;
+
+        public float InteractionRadius => _interactionRadius;
 
         public void Interact(Transform playerTransform)
         {
@@ -39,11 +44,16 @@ namespace _SpellboundHollow.Scripts.Gameplay
             {
                 ExecuteInteraction(initialAction, playerTransform, initialDialogueSo, initialInlineDialogue, initialThoughtTexts);
                 _hasBeenTriggered = true;
+                
+                if (destroyAfterInteraction)
+                {
+                    Destroy(gameObject);
+                }
             }
             else
             {
                 var actionToExecute = subsequentAction == InteractionType.RepeatInitial ? initialAction : subsequentAction;
-                var dialogueToExecute = subsequentAction == InteractionType.RepeatInitial ? initialDialogueSo : subsequentDialogueSo;
+                var dialogueToExecute = subsequentAction == InteractionType.RepeatInitial ? subsequentDialogueSo : subsequentDialogueSo;
                 var inlineToExecute = subsequentAction == InteractionType.RepeatInitial ? initialInlineDialogue : subsequentInlineDialogue;
                 var thoughtsToExecute = subsequentAction == InteractionType.RepeatInitial ? initialThoughtTexts : subsequentThoughtTexts;
                 ExecuteInteraction(actionToExecute, playerTransform, dialogueToExecute, inlineToExecute, thoughtsToExecute);
@@ -70,6 +80,25 @@ namespace _SpellboundHollow.Scripts.Gameplay
                     {
                         string textToShow = thoughts[Random.Range(0, thoughts.Length)];
                         ThoughtBubbleController.Instance.ShowThought(textToShow, playerTransform, 4f);
+                    }
+                    break;
+                case InteractionType.ShowUIPrefab:
+                    if (uiPrefabToShow != null)
+                    {
+                        Transform canvasTransform = GameManager.Instance.MainCanvasTransform;
+                        if (canvasTransform != null)
+                        {
+                            Instantiate(uiPrefabToShow, canvasTransform);
+                            GameManager.Instance.SetGameState(GameState.Paused);
+                        }
+                        else
+                        {
+                            Debug.LogError("MainCanvasTransform не назначен в GameManager! Невозможно создать UI.", this);
+                        }
+                    }
+                    else
+                    {
+                        Debug.LogWarning("InteractionType.ShowUIPrefab, но префаб UI не назначен!", this);
                     }
                     break;
                 case InteractionType.DoNothing:
